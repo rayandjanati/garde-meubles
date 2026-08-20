@@ -17,7 +17,7 @@
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; }
   .disp { font-family: 'Space Grotesk', sans-serif; }
   .mono { font-family: 'IBM Plex Mono', monospace; }
-  .stamp { display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px; border-radius: 20px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: 0.02em; font-size: 12px; }
+  .stamp { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 2px solid currentColor; border-radius: 3px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: 0.06em; font-size: 12px; text-transform: uppercase; transform: rotate(-2deg); }
   .btn { cursor: pointer; border: none; font-family: 'Inter', sans-serif; font-weight: 600; transition: opacity .15s, transform .1s; }
   .btn:hover { opacity: 0.88; } .btn:active { transform: scale(0.97); } .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   input, textarea { font-family: 'Inter', sans-serif; }
@@ -75,7 +75,7 @@
     BASE_ID: "appCsFrur25UtzNom",
 
     TABLE_CLIENTS: "Clients",
-    TABLE_PAIEMENTS: "Paiements",
+    TABLE_PAIEMENTS: "tbl4K41ZHRdAXPGrL",
 
     FIELD_CLIENT_NOM: "Clients",
     FIELD_TELEPHONE: "Téléphone",
@@ -389,7 +389,7 @@ function renderClients(){
             <td class="mono" style="color:var(--muted);">${escapeHtml(c.telephone||'—')}</td>
             <td class="mono" style="color:var(--muted);">${periodLabel(periodKey)}</td>
             <td class="mono num" style="font-weight:600;">${formatEUR(tarifTrimestreTTC(c.volume))}</td>
-            <td class="center"><span class="stamp" style="background:${lateC?'var(--danger-tint)':'var(--success-tint)'};color:${lateC?'var(--danger)':'var(--success)'};">${lateC?'En retard':'À jour'}</span></td>
+            <td class="center"><span class="stamp" style="color:${lateC?'var(--danger)':'var(--success)'};">${lateC?'En retard':'À jour'}</span></td>
           </tr>`;
         }).join("")}
         </tbody>
@@ -509,7 +509,7 @@ function renderModal(){
               <div class="disp" style="font-size:20px;font-weight:700;color:var(--primary);">FACTURE</div>
               <div class="mono" style="font-size:13px;color:var(--muted);">N° ${invoiceNumber}</div>
               <div class="mono" style="font-size:13px;color:var(--muted);">${today}</div>
-              <span class="stamp" style="background:${paid?'var(--success-tint)':'var(--danger-tint)'};color:${paid?'var(--success)':'var(--danger)'};margin-top:8px;display:inline-flex;">${paid?"Payé":"Non payé"}</span>
+              <span class="stamp" style="color:${paid?'var(--success)':'var(--danger)'};margin-top:8px;display:inline-flex;">${paid?"Payé":"Non payé"}</span>
             </div>
           </div>
           <div style="margin-bottom:26px;">
