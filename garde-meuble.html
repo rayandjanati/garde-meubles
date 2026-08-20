@@ -476,10 +476,18 @@ function printInvoice(clientId, periode, isRelance){
   const c = state.clients.find(cl => cl.id === clientId);
   if (!c) return;
   const content = invoiceContentHTML(c, periode, isRelance);
-  const w = window.open("", "_blank", "width=850,height=1000");
-  if (!w) { alert("Le navigateur a bloqué l'ouverture de la fenêtre d'impression — autorise les pop-ups pour ce site."); return; }
-  w.document.open();
-  w.document.write(`<!DOCTYPE html>
+
+  const old = document.getElementById("print-frame");
+  if (old) old.remove();
+
+  const frame = document.createElement("iframe");
+  frame.id = "print-frame";
+  frame.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;";
+  document.body.appendChild(frame);
+
+  const doc = frame.contentWindow.document;
+  doc.open();
+  doc.write(`<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8" />
 <title>Facture — ${escapeHtml(c.nom)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -495,11 +503,18 @@ function printInvoice(clientId, periode, isRelance){
   .invoice-table td { padding:12px 4px; font-size:14px; border-bottom:1px solid var(--border); }
 </style>
 </head><body>${content}</body></html>`);
-  w.document.close();
+  doc.close();
+
   let printed = false;
-  const doPrint = () => { if (printed) return; printed = true; w.focus(); w.print(); };
-  w.onload = doPrint;
-  setTimeout(doPrint, 400);
+  const doPrint = () => {
+    if (printed) return; printed = true;
+    frame.contentWindow.focus();
+    frame.contentWindow.print();
+    // Clean up the hidden frame a little after the print dialog appears
+    setTimeout(() => { const f = document.getElementById("print-frame"); if (f) f.remove(); }, 1000);
+  };
+  frame.onload = doPrint;
+  setTimeout(doPrint, 500);
 }
 function closeModal(){ state.modal = null; render(); }
 
