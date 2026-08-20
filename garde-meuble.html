@@ -343,7 +343,7 @@ function renderClients(){
   });
 
   return `
-  <div style="padding:28px;max-width:1100px;margin:0 auto;">
+  <div style="padding:28px;max-width:1320px;margin:0 auto;">
     <div class="stats no-print">
       <div class="statcard"><div class="statlabel">Clients actifs</div><div class="statvalue mono">${state.clients.length}</div></div>
       <div class="statcard"><div class="statlabel">En retard (période en cours)</div><div class="statvalue mono" style="color:var(--danger);">${late}</div></div>
@@ -387,7 +387,7 @@ function renderClients(){
             <td class="mono" style="color:var(--muted);">${escapeHtml(c.box||'—')}</td>
             <td class="mono num">${c.volume}m³</td>
             <td class="mono" style="color:var(--muted);">${escapeHtml(c.telephone||'—')}</td>
-            <td class="mono" style="color:var(--muted);">${periodLabel(periodKey)}</td>
+            <td class="mono" style="color:var(--muted);white-space:nowrap;">${periodLabel(periodKey)}</td>
             <td class="mono num" style="font-weight:600;">${formatEUR(tarifTrimestreTTC(c.volume))}</td>
             <td class="center"><span class="stamp" style="color:${lateC?'var(--danger)':'var(--success)'};">${lateC?'En retard':'À jour'}</span></td>
           </tr>`;
