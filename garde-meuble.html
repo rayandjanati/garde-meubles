@@ -343,7 +343,7 @@ function renderClients(){
   });
 
   return `
-  <div style="padding:28px;">
+  <div style="padding:28px;max-width:1100px;margin:0 auto;">
     <div class="stats no-print">
       <div class="statcard"><div class="statlabel">Clients actifs</div><div class="statvalue mono">${state.clients.length}</div></div>
       <div class="statcard"><div class="statlabel">En retard (période en cours)</div><div class="statvalue mono" style="color:var(--danger);">${late}</div></div>
