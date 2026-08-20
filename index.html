@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Garde-meuble — Suivi & Facturation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #EDEEEA; --surface: #FFFFFF; --ink: #1F2937; --muted: #6B7280;
+    --border: #D8D5CC; --primary: #2B4C6F; --accent: #D98E2B; --success: #3E7A50; --danger: #B54708;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; }
+  .disp { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: 0.02em; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .stamp { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 2px solid currentColor; border-radius: 3px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; letter-spacing: 0.08em; font-size: 12px; text-transform: uppercase; transform: rotate(-2deg); }
+  .btn { cursor: pointer; border: none; font-family: 'Inter', sans-serif; font-weight: 600; transition: opacity .15s, transform .1s; }
+  .btn:hover { opacity: 0.88; } .btn:active { transform: scale(0.97); } .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  input, textarea { font-family: 'Inter', sans-serif; }
+  input:focus, textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+  .header { background: var(--ink); color: var(--bg); padding: 22px 28px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
+  .tabbtn { padding: 8px 16px; border-radius: 4px; border: 1px solid var(--accent); font-size: 14px; background: transparent; color: var(--bg); }
+  .tabbtn.active { background: var(--accent); color: var(--ink); }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .statcard { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; }
+  .statlabel { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .statvalue { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .search { flex: 1 1 220px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; background: #fff; }
+  .filterbtn { padding: 8px 14px; border-radius: 4px; font-size: 13px; background: #fff; color: var(--ink); border: 1px solid var(--border); }
+  .filterbtn.active { background: var(--primary); color: #fff; }
+  .clients-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .clients-table th { text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); padding: 10px 14px; border-bottom: 2px solid var(--border); background: #F7F6F3; }
+  .clients-table td { padding: 10px 14px; font-size: 14px; border-bottom: 1px solid var(--border); }
+  .clients-table tr:last-child td { border-bottom: none; }
+  .clients-table tbody tr { cursor: pointer; transition: background .1s; }
+  .clients-table tbody tr:hover { background: #F7F6F3; }
+  .clients-table td.num, .clients-table th.num { text-align: right; }
+  .clients-table td.center, .clients-table th.center { text-align: center; }
+  @media (max-width: 720px) {
+    .clients-table thead { display: none; }
+    .clients-table, .clients-table tbody, .clients-table tr, .clients-table td { display: block; width: 100%; }
+    .clients-table tr { border-bottom: 4px solid var(--bg); padding: 8px 0; }
+    .clients-table td { border-bottom: none; padding: 3px 14px; text-align: left !important; }
+  }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(31,41,55,0.5); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+  .modal { background: #fff; border-radius: 8px; padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+  .field { display: grid; gap: 4px; margin-bottom: 10px; }
+  .field label { font-size: 12px; font-weight: 600; color: var(--muted); }
+  .field input, .field textarea { padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; width: 100%; }
+  .paymentrow { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #F7F6F3; border-radius: 4px; margin-bottom: 6px; }
+  .invoice-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  .invoice-table th { text-align: left; padding: 8px 4px; font-size: 12px; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid var(--ink); }
+  .invoice-table td { padding: 12px 4px; font-size: 14px; border-bottom: 1px solid var(--border); }
+  #banner { display: none; background: #F6DDBD; color: #7A4A0A; padding: 8px 28px; font-size: 13px; }
+  @media print { .no-print { display: none !important; } body { background: #fff; } }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- ⚠️ À MODIFIER : colle ton token et ton Base ID Airtable ici   -->
+<!-- ============================================================ -->
+<script>
+  const CONFIG = {
+    AIRTABLE_TOKEN: "patgsRuFpfT7KDRyZ.6e24993d00d0a17d62fc4a1b2fffaa50fe1ca55f5d0cec371b721a020eecb7a9",
+    BASE_ID: "appCsFrur25UtzNom",
+
+    TABLE_CLIENTS: "Clients",
+    TABLE_PAIEMENTS: "Paiements",
+
+    FIELD_CLIENT_NOM: "Clients",
+    FIELD_TELEPHONE: "Téléphone",
+    FIELD_EMAIL: "Email",
+    FIELD_BOX: "Box",
+    FIELD_VOLUME: "Volume (m3)",           // ⚠️ à créer dans Airtable si pas déjà fait (type Nombre)
+    FIELD_DATE_DEBUT: "Date début",         // format AAAA-MM — sert d'ancre au cycle de 3 mois du client
+
+    FIELD_PAIEMENT_LIEN: "Clients Lien",
+    FIELD_MOIS: "Mois",                     // stocke la clé de la période trimestrielle (AAAA-MM = 1er mois du trimestre du client)
+    FIELD_PAYE: "Paie",
+    FIELD_DATE_PAIEMENT: "Date paiement",
+
+    PRICE_PER_M3: 12,     // €/m³ HT / mois
+    TVA_RATE: 0.20,
+
+    COMPANY: {
+      nom: "France Perse Monaco",
+      adresse: "", telephone: "", email: "", siret: "", tva: "", iban: "",
+    },
+  };
+</script>
+
+<div id="banner"></div>
+<div id="app"></div>
+
+<script>
+const MONTHS_FR = ["Janv.","Févr.","Mars","Avr.","Mai","Juin","Juil.","Août","Sept.","Oct.","Nov.","Déc."];
+function pad2(n){ return String(n).padStart(2,"0"); }
+function formatEUR(n){ return new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR"}).format(n||0); }
+function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+function escapeAttr(s){ return escapeHtml(s); }
+
+function todayYM(){ const d = new Date(); return { y: d.getFullYear(), m: d.getMonth()+1 }; }
+function parseYM(str){
+  if (!str || !/^\d{4}-\d{2}$/.test(str)) return null;
+  const [y,m] = str.split("-").map(Number);
+  return { y, m };
+}
+function ymToIndex(y,m){ return y*12 + (m-1); }
+function indexToYM(idx){ return { y: Math.floor(idx/12), m: (idx%12)+1 }; }
+function ymKey(ym){ return `${ym.y}-${pad2(ym.m)}`; }
+
+// The quarter/period a client is in, anchored on their own Date début, rolling every 3 months.
+function currentPeriodKeyForClient(dateDebutStr){
+  const start = parseYM(dateDebutStr);
+  const today = todayYM();
+  if (!start) return ymKey(today);
+  const startIdx = ymToIndex(start.y, start.m);
+  const todayIdx = ymToIndex(today.y, today.m);
+  const diff = todayIdx - startIdx;
+  if (diff < 0) return ymKey(start); // hasn't started yet -> first period
+  const cycles = Math.floor(diff / 3);
+  return ymKey(indexToYM(startIdx + cycles*3));
+}
+function periodLabel(periodKey){
+  const start = parseYM(periodKey);
+  if (!start) return periodKey;
+  const startIdx = ymToIndex(start.y, start.m);
+  const end = indexToYM(startIdx + 2);
+  return `${MONTHS_FR[start.m-1]} ${start.y} — ${MONTHS_FR[end.m-1]} ${end.y}`;
+}
+function lastNPeriodsForClient(dateDebutStr, n){
+  const start = parseYM(dateDebutStr);
+  const currentKey = currentPeriodKeyForClient(dateDebutStr);
+  const currentStart = parseYM(currentKey);
+  const currentIdx = ymToIndex(currentStart.y, currentStart.m);
+  const startIdx = start ? ymToIndex(start.y, start.m) : currentIdx;
+  const periods = [];
+  for (let idx = currentIdx; idx >= startIdx && periods.length < n; idx -= 3) {
+    periods.push(ymKey(indexToYM(idx)));
+  }
+  return periods.reverse();
+}
+
+function tarifMensuelHT(volume){ return (Number(volume)||0) * CONFIG.PRICE_PER_M3; }
+function tarifTrimestreHT(volume){ return tarifMensuelHT(volume) * 3; }
+function tarifTrimestreTTC(volume){ return tarifTrimestreHT(volume) * (1 + CONFIG.TVA_RATE); }
+
+let state = {
+  clients: [], payments: [], loading: true, error: null,
+  tab: "clients", search: "", filter: "tous", modal: null,
+};
+
+function showBanner(msg){ const b = document.getElementById("banner"); b.textContent = msg; b.style.display = "block"; }
+function hideBanner(){ document.getElementById("banner").style.display = "none"; }
+
+async function airtableRequest(table, { method="GET", path="", body=null } = {}){
+  const url = `https://api.airtable.com/v0/${CONFIG.BASE_ID}/${encodeURIComponent(table)}${path}`;
+  const res = await fetch(url, {
+    method,
+    headers: { "Authorization": `Bearer ${CONFIG.AIRTABLE_TOKEN}`, "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) { const text = await res.text(); throw new Error(`Airtable ${method} ${table} → ${res.status}: ${text}`); }
+  return res.json();
+}
+
+async function fetchAll(table){
+  let records = []; let offset = undefined;
+  do {
+    const path = offset ? `?pageSize=100&offset=${offset}` : `?pageSize=100`;
+    const data = await airtableRequest(table, { path });
+    records = records.concat(data.records);
+    offset = data.offset;
+  } while (offset);
+  return records;
+}
+
+async function loadData(){
+  state.loading = true; state.error = null; render();
+  try {
+    const [clientRecords, paymentRecords] = await Promise.all([
+      fetchAll(CONFIG.TABLE_CLIENTS), fetchAll(CONFIG.TABLE_PAIEMENTS),
+    ]);
+    state.clients = clientRecords.map(r => ({
+      id: r.id,
+      nom: r.fields[CONFIG.FIELD_CLIENT_NOM] || "",
+      telephone: r.fields[CONFIG.FIELD_TELEPHONE] || "",
+      email: r.fields[CONFIG.FIELD_EMAIL] || "",
+      box: r.fields[CONFIG.FIELD_BOX] || "",
+      volume: r.fields[CONFIG.FIELD_VOLUME] || 0,
+      dateDebut: r.fields[CONFIG.FIELD_DATE_DEBUT] || "",
+    }));
+    state.payments = paymentRecords.map(r => {
+      const link = r.fields[CONFIG.FIELD_PAIEMENT_LIEN];
+      return {
+        id: r.id,
+        clientId: Array.isArray(link) && link.length ? link[0] : null,
+        periode: r.fields[CONFIG.FIELD_MOIS] || "",
+        paye: !!r.fields[CONFIG.FIELD_PAYE],
+        date: r.fields[CONFIG.FIELD_DATE_PAIEMENT] || "",
+      };
+    });
+    hideBanner();
+  } catch (e) {
+    console.error(e);
+    state.error = e.message;
+    showBanner("Impossible de charger les données Airtable — vérifie ton token, ton Base ID et les noms de champs en haut du fichier. Détail : " + e.message);
+  }
+  state.loading = false; render();
+}
+
+function paymentFor(clientId, periode){ return state.payments.find(p => p.clientId === clientId && p.periode === periode); }
+function isPaid(clientId, periode){ const p = paymentFor(clientId, periode); return !!(p && p.paye); }
+function isLate(client){
+  const currentKey = currentPeriodKeyForClient(client.dateDebut);
+  const start = parseYM(client.dateDebut);
+  const today = todayYM();
+  if (start && ymToIndex(start.y,start.m) > ymToIndex(today.y,today.m)) return false; // not started yet
+  return !isPaid(client.id, currentKey);
+}
+
+async function togglePaid(clientId, periode){
+  const existing = paymentFor(clientId, periode);
+  try {
+    if (existing) {
+      await airtableRequest(CONFIG.TABLE_PAIEMENTS, { method: "PATCH", path: `/${existing.id}`, body: { fields: { [CONFIG.FIELD_PAYE]: !existing.paye } } });
+      existing.paye = !existing.paye;
+    } else {
+      const data = await airtableRequest(CONFIG.TABLE_PAIEMENTS, { method: "POST", body: { fields: {
+        [CONFIG.FIELD_PAIEMENT_LIEN]: [clientId], [CONFIG.FIELD_MOIS]: periode, [CONFIG.FIELD_PAYE]: true,
+        [CONFIG.FIELD_DATE_PAIEMENT]: new Date().toISOString().slice(0,10),
+      }}});
+      state.payments.push({ id: data.id, clientId, periode, paye: true, date: new Date().toISOString().slice(0,10) });
+    }
+    render();
+  } catch (e) { showBanner("Échec de la mise à jour du paiement : " + e.message); }
+}
+
+async function saveClient(form){
+  const fields = {
+    [CONFIG.FIELD_CLIENT_NOM]: form.nom,
+    [CONFIG.FIELD_TELEPHONE]: form.telephone,
+    [CONFIG.FIELD_EMAIL]: form.email,
+    [CONFIG.FIELD_BOX]: form.box,
+    [CONFIG.FIELD_VOLUME]: Number(form.volume) || 0,
+    [CONFIG.FIELD_DATE_DEBUT]: form.dateDebut,
+  };
+  try {
+    if (form.id) {
+      await airtableRequest(CONFIG.TABLE_CLIENTS, { method: "PATCH", path: `/${form.id}`, body: { fields } });
+      const c = state.clients.find(c => c.id === form.id);
+      Object.assign(c, { nom: form.nom, telephone: form.telephone, email: form.email, box: form.box, volume: Number(form.volume)||0, dateDebut: form.dateDebut });
+    } else {
+      const data = await airtableRequest(CONFIG.TABLE_CLIENTS, { method: "POST", body: { fields } });
+      state.clients.push({ id: data.id, nom: form.nom, telephone: form.telephone, email: form.email, box: form.box, volume: Number(form.volume)||0, dateDebut: form.dateDebut });
+    }
+    state.modal = null; render();
+  } catch (e) { showBanner("Échec de l'enregistrement : " + e.message); }
+}
+
+async function deleteClient(id){
+  if (!confirm("Supprimer ce client ?")) return;
+  try {
+    await airtableRequest(CONFIG.TABLE_CLIENTS, { method: "DELETE", path: `/${id}` });
+    state.clients = state.clients.filter(c => c.id !== id);
+    state.modal = null; render();
+  } catch (e) { showBanner("Échec de la suppression : " + e.message); }
+}
+
+// ---------- RENDER ----------
+
+function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <div class="header no-print">
+      <div>
+        <div class="disp" style="font-size:13px;color:var(--accent);font-weight:700;">Garde-meuble · Suivi & Facturation trimestrielle</div>
+        <div class="disp" style="font-size:34px;font-weight:800;line-height:1;">${CONFIG.COMPANY.nom || "Mon entreprise"}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn tabbtn ${state.tab==='clients'?'active':''}" onclick="setTab('clients')">Clients</button>
+        <button class="btn tabbtn ${state.tab==='parametres'?'active':''}" onclick="setTab('parametres')">Paramètres</button>
+      </div>
+    </div>
+    ${state.loading ? `<div style="padding:60px;text-align:center;color:var(--muted);">Chargement des données…</div>` : renderTab()}
+  `;
+  renderModal();
+}
+function setTab(t){ state.tab = t; render(); }
+function renderTab(){ return state.tab === "parametres" ? renderParams() : renderClients(); }
+
+function renderParams(){
+  const co = CONFIG.COMPANY;
+  return `
+  <div class="no-print" style="padding:28px;max-width:560px;">
+    <div class="disp" style="font-size:20px;font-weight:700;margin-bottom:14px;">Infos entreprise & tarif</div>
+    <div style="background:#fff;padding:20px;border-radius:8px;border:1px solid var(--border);">
+      <p style="font-size:13px;color:var(--muted);">Ces valeurs sont définies dans le fichier (objet <span class="mono">CONFIG</span> en haut du code) — modifie-les là-bas puis republie le fichier.</p>
+      <table class="mono" style="font-size:13px;width:100%;">
+        <tr><td style="padding:4px 0;color:var(--muted);">Prix / m³ HT / mois</td><td>${formatEUR(CONFIG.PRICE_PER_M3)}</td></tr>
+        <tr><td style="padding:4px 0;color:var(--muted);">TVA</td><td>${(CONFIG.TVA_RATE*100).toFixed(0)}%</td></tr>
+        <tr><td style="padding:4px 0;color:var(--muted);">Nom entreprise</td><td>${escapeHtml(co.nom||"—")}</td></tr>
+        <tr><td style="padding:4px 0;color:var(--muted);">Adresse</td><td>${escapeHtml(co.adresse||"—")}</td></tr>
+        <tr><td style="padding:4px 0;color:var(--muted);">Téléphone</td><td>${escapeHtml(co.telephone||"—")}</td></tr>
+        <tr><td style="padding:4px 0;color:var(--muted);">Email</td><td>${escapeHtml(co.email||"—")}</td></tr>
+        <tr><td style="padding:4px 0;color:var(--muted);">SIRET</td><td>${escapeHtml(co.siret||"—")}</td></tr>
+        <tr><td style="padding:4px 0;color:var(--muted);">IBAN</td><td>${escapeHtml(co.iban||"—")}</td></tr>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderClients(){
+  const late = state.clients.filter(isLate).length;
+  const revenue = state.clients.reduce((s,c)=> s + (isPaid(c.id, currentPeriodKeyForClient(c.dateDebut)) ? tarifTrimestreTTC(c.volume) : 0), 0);
+  const expected = state.clients.reduce((s,c)=> s + tarifTrimestreTTC(c.volume), 0);
+
+  let list = state.clients;
+  if (state.filter === "retard") list = list.filter(isLate);
+  if (state.filter === "jour") list = list.filter(c => !isLate(c));
+  if (state.search.trim()){
+    const s = state.search.toLowerCase();
+    list = list.filter(c => (c.nom||"").toLowerCase().includes(s) || (c.box||"").toLowerCase().includes(s) || (c.telephone||"").includes(s));
+  }
+  list = [...list].sort((a,b) => {
+    const la = isLate(a) ? 0 : 1, lb = isLate(b) ? 0 : 1;
+    if (la !== lb) return la - lb;
+    return (a.nom||"").localeCompare(b.nom||"");
+  });
+
+  return `
+  <div style="padding:28px;">
+    <div class="stats no-print">
+      <div class="statcard"><div class="statlabel">Clients actifs</div><div class="statvalue mono">${state.clients.length}</div></div>
+      <div class="statcard"><div class="statlabel">En retard (période en cours)</div><div class="statvalue mono" style="color:var(--danger);">${late}</div></div>
+      <div class="statcard"><div class="statlabel">Encaissé — périodes en cours</div><div class="statvalue mono">${formatEUR(revenue)}</div></div>
+      <div class="statcard"><div class="statlabel">Attendu / trimestre (TTC)</div><div class="statvalue mono">${formatEUR(expected)}</div></div>
+    </div>
+
+    <div class="controls no-print">
+      <input class="search" placeholder="Rechercher un client, un box..." value="${escapeAttr(state.search)}" oninput="state.search=this.value; render();" />
+      <div style="display:flex;gap:6px;">
+        <button class="btn filterbtn ${state.filter==='tous'?'active':''}" onclick="state.filter='tous';render();">Tous</button>
+        <button class="btn filterbtn ${state.filter==='retard'?'active':''}" onclick="state.filter='retard';render();">En retard</button>
+        <button class="btn filterbtn ${state.filter==='jour'?'active':''}" onclick="state.filter='jour';render();">À jour</button>
+      </div>
+      <button class="btn" onclick="openAddModal()" style="padding:9px 16px;border-radius:4px;background:var(--accent);color:var(--ink);font-size:14px;font-weight:700;">+ Nouveau client</button>
+    </div>
+
+    ${list.length === 0 ? `
+      <div style="text-align:center;padding:60px 20px;color:var(--muted);">
+        ${state.clients.length === 0 ? "Aucun client pour l'instant. Ajoute le premier box loué." : "Aucun résultat pour ce filtre."}
+      </div>` : `
+      <table class="clients-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Box</th>
+            <th class="num">Volume</th>
+            <th>Téléphone</th>
+            <th>Période en cours</th>
+            <th class="num">Tarif TTC / trim.</th>
+            <th class="center">Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+        ${list.map(c => {
+          const lateC = isLate(c);
+          const periodKey = currentPeriodKeyForClient(c.dateDebut);
+          return `
+          <tr onclick="openDetail('${c.id}')">
+            <td style="font-weight:700;">${escapeHtml(c.nom)}</td>
+            <td class="mono" style="color:var(--muted);">${escapeHtml(c.box||'—')}</td>
+            <td class="mono num">${c.volume}m³</td>
+            <td class="mono" style="color:var(--muted);">${escapeHtml(c.telephone||'—')}</td>
+            <td class="mono" style="color:var(--muted);">${periodLabel(periodKey)}</td>
+            <td class="mono num" style="font-weight:600;">${formatEUR(tarifTrimestreTTC(c.volume))}</td>
+            <td class="center"><span class="stamp" style="color:${lateC?'var(--danger)':'var(--success)'};">${lateC?'En retard':'À jour'}</span></td>
+          </tr>`;
+        }).join("")}
+        </tbody>
+      </table>`}
+  </div>`;
+}
+
+// ---------- MODALS ----------
+
+function openAddModal(){ state.modal = { type: "form", form: { nom:"", telephone:"", email:"", box:"", volume:"", dateDebut: `${todayYM().y}-${pad2(todayYM().m)}` } }; render(); }
+function openEditModal(id){
+  const c = state.clients.find(c => c.id === id);
+  state.modal = { type: "form", form: { id: c.id, nom: c.nom, telephone: c.telephone, email: c.email, box: c.box, volume: c.volume, dateDebut: c.dateDebut } };
+  render();
+}
+function openDetail(id){ state.modal = { type: "detail", clientId: id }; render(); }
+function openInvoice(clientId, periode){ state.modal = { type: "invoice", clientId, periode }; render(); }
+function closeModal(){ state.modal = null; render(); }
+
+function renderModal(){
+  const existing = document.getElementById("modal-root");
+  if (existing) existing.remove();
+  if (!state.modal) return;
+  const div = document.createElement("div");
+  div.id = "modal-root";
+
+  if (state.modal.type === "form"){
+    const f = state.modal.form;
+    div.innerHTML = `
+    <div class="modal-overlay no-print" onclick="closeModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="disp" style="font-size:20px;font-weight:700;margin-bottom:14px;">${f.id?"Modifier le client":"Nouveau client"}</div>
+        <div class="field"><label>Nom / Société</label><input id="f-nom" value="${escapeAttr(f.nom)}"/></div>
+        <div class="field"><label>Téléphone</label><input id="f-telephone" value="${escapeAttr(f.telephone)}"/></div>
+        <div class="field"><label>Email</label><input id="f-email" value="${escapeAttr(f.email)}"/></div>
+        <div class="field"><label>N° de box (optionnel)</label><input id="f-box" value="${escapeAttr(f.box)}"/></div>
+        <div class="field"><label>Volume (m³)</label><input id="f-volume" value="${escapeAttr(f.volume)}"/></div>
+        <div class="field"><label>Mois de début (ancre du cycle de 3 mois)</label><input id="f-dateDebut" type="month" value="${escapeAttr(f.dateDebut)}"/></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Tarif estimé : <span class="mono">${formatEUR(tarifTrimestreTTC(f.volume))}</span> TTC / trimestre</div>
+        <div style="display:flex;justify-content:space-between;margin-top:18px;">
+          <div>${f.id ? `<button class="btn" onclick="deleteClient('${f.id}')" style="padding:9px 14px;border-radius:4px;background:transparent;color:var(--danger);font-size:13px;">Supprimer</button>` : ""}</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn" onclick="closeModal()" style="padding:9px 16px;border-radius:4px;background:var(--bg);font-size:14px;">Annuler</button>
+            <button class="btn" onclick="submitForm(${f.id ? `'${f.id}'` : "null"})" style="padding:9px 16px;border-radius:4px;background:var(--primary);color:#fff;font-size:14px;font-weight:700;">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if (state.modal.type === "detail"){
+    const c = state.clients.find(c => c.id === state.modal.clientId);
+    const periods = lastNPeriodsForClient(c.dateDebut, 4);
+    div.innerHTML = `
+    <div class="modal-overlay no-print" onclick="closeModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div class="disp" style="font-size:24px;font-weight:800;">${escapeHtml(c.nom)}</div>
+            <div class="mono" style="font-size:13px;color:var(--muted);">Box ${escapeHtml(c.box||'—')} · ${c.volume}m³ · ${formatEUR(tarifTrimestreTTC(c.volume))}/trim. TTC</div>
+          </div>
+          <button class="btn" onclick="openEditModal('${c.id}')" style="padding:6px 12px;border-radius:4px;background:var(--bg);font-size:13px;">Modifier</button>
+        </div>
+        <div style="margin-top:6px;font-size:13px;color:var(--muted);">
+          ${c.telephone ? `<div>${escapeHtml(c.telephone)}</div>` : ""}
+          ${c.email ? `<div>${escapeHtml(c.email)}</div>` : ""}
+        </div>
+        <div class="disp" style="font-size:15px;font-weight:700;margin-top:20px;margin-bottom:8px;">Paiements (par trimestre, depuis le début)</div>
+        <div>
+          ${periods.map(p => {
+            const paid = isPaid(c.id, p);
+            return `
+            <div class="paymentrow">
+              <span style="font-size:13px;font-weight:600;">${periodLabel(p)}</span>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn" onclick="togglePaid('${c.id}','${p}')" style="padding:5px 12px;border-radius:4px;font-size:12px;font-weight:700;background:${paid?'var(--success)':'#fff'};color:${paid?'#fff':'var(--danger)'};border:1px solid ${paid?'var(--success)':'var(--accent)'};">
+                  ${paid?"Payé ✓":"Marquer payé"}
+                </button>
+                <button class="btn" onclick="openInvoice('${c.id}','${p}')" style="padding:5px 10px;border-radius:4px;font-size:12px;background:transparent;color:var(--primary);text-decoration:underline;">Facture</button>
+              </div>
+            </div>`;
+          }).join("")}
+        </div>
+        <div style="margin-top:18px;text-align:right;">
+          <button class="btn" onclick="closeModal()" style="padding:9px 16px;border-radius:4px;background:var(--bg);font-size:14px;">Fermer</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if (state.modal.type === "invoice"){
+    const c = state.clients.find(c => c.id === state.modal.clientId);
+    const periode = state.modal.periode;
+    const paid = isPaid(c.id, periode);
+    const invoiceNumber = `${periode.replace("-","")}-${(c.box || c.id).toString().toUpperCase()}`;
+    const today = new Date().toLocaleDateString("fr-FR");
+    const co = CONFIG.COMPANY;
+    const ht = tarifTrimestreHT(c.volume);
+    const ttc = tarifTrimestreTTC(c.volume);
+    const tva = ttc - ht;
+    div.innerHTML = `
+    <div class="modal-overlay" onclick="closeModal()">
+      <div class="modal" style="max-width:640px;padding:0;" onclick="event.stopPropagation()">
+        <div style="padding:40px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;border-bottom:3px solid var(--ink);padding-bottom:16px;">
+            <div>
+              <div class="disp" style="font-size:26px;font-weight:800;">${escapeHtml(co.nom||"Entreprise")}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">
+                ${co.adresse?`<div>${escapeHtml(co.adresse)}</div>`:""}
+                ${co.telephone?`<div>${escapeHtml(co.telephone)}</div>`:""}
+                ${co.email?`<div>${escapeHtml(co.email)}</div>`:""}
+                ${co.siret?`<div>SIRET : ${escapeHtml(co.siret)}</div>`:""}
+                ${co.tva?`<div>TVA : ${escapeHtml(co.tva)}</div>`:""}
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div class="disp" style="font-size:20px;font-weight:700;color:var(--primary);">FACTURE</div>
+              <div class="mono" style="font-size:13px;color:var(--muted);">N° ${invoiceNumber}</div>
+              <div class="mono" style="font-size:13px;color:var(--muted);">${today}</div>
+              <span class="stamp" style="color:${paid?'var(--success)':'var(--danger)'};margin-top:8px;display:inline-flex;">${paid?"Payé":"Non payé"}</span>
+            </div>
+          </div>
+          <div style="margin-bottom:26px;">
+            <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.05em;">Facturé à</div>
+            <div style="font-size:16px;font-weight:700;margin-top:4px;">${escapeHtml(c.nom)}</div>
+            <div style="font-size:13px;color:var(--muted);">${escapeHtml(c.telephone||"")} ${c.email?`· ${escapeHtml(c.email)}`:""}</div>
+          </div>
+          <table class="invoice-table">
+            <thead><tr><th>Description</th><th style="text-align:right;">Montant</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Location garde-meuble — Box ${escapeHtml(c.box||"—")} · ${c.volume}m³<br/><span style="font-size:12px;color:var(--muted);">Période : ${periodLabel(periode)}</span></td>
+                <td class="mono" style="text-align:right;">${formatEUR(ht)}</td>
+              </tr>
+              <tr>
+                <td style="color:var(--muted);">TVA (${(CONFIG.TVA_RATE*100).toFixed(0)}%)</td>
+                <td class="mono" style="text-align:right;color:var(--muted);">${formatEUR(tva)}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;">
+            <div style="width:220px;display:flex;justify-content:space-between;padding:6px 0;font-size:15px;font-weight:800;border-top:2px solid var(--ink);">
+              <span>Total TTC</span><span class="mono">${formatEUR(ttc)}</span>
+            </div>
+          </div>
+          ${co.iban ? `<div style="margin-top:24px;font-size:12px;color:var(--muted);">Paiement par virement — IBAN : <span class="mono">${escapeHtml(co.iban)}</span></div>` : ""}
+        </div>
+        <div class="no-print" style="display:flex;justify-content:flex-end;gap:8px;padding:16px 40px 24px;">
+          <button class="btn" onclick="closeModal()" style="padding:9px 16px;border-radius:4px;background:var(--bg);font-size:14px;">Fermer</button>
+          <button class="btn" onclick="window.print()" style="padding:9px 18px;border-radius:4px;background:var(--primary);color:#fff;font-size:14px;font-weight:700;">Imprimer / PDF</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  document.body.appendChild(div);
+}
+
+function submitForm(id){
+  const form = {
+    id: id || undefined,
+    nom: document.getElementById("f-nom").value.trim(),
+    telephone: document.getElementById("f-telephone").value.trim(),
+    email: document.getElementById("f-email").value.trim(),
+    box: document.getElementById("f-box").value.trim(),
+    dateDebut: document.getElementById("f-dateDebut").value,
+    volume: document.getElementById("f-volume").value.replace(/[^0-9.]/g,""),
+  };
+  if (!form.nom || !form.volume) { alert("Nom et volume sont obligatoires."); return; }
+  saveClient(form);
+}
+
+loadData();
+</script>
+</body>
+</html>
