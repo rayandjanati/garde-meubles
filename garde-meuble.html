@@ -88,7 +88,6 @@
     FIELD_MOIS: "Mois",                     // stocke la clé de la période trimestrielle (AAAA-MM = 1er mois du trimestre du client)
     FIELD_PAYE: "Paie",
     FIELD_DATE_PAIEMENT: "Date paiement",
-    FIELD_RELANCES: "Relances",             // ⚠️ à créer dans Airtable si pas déjà fait (type Nombre) — compteur de relances envoyées
 
     PRICE_PER_M3: 12,     // €/m³ HT / mois
     TVA_RATE: 0.20,
@@ -210,7 +209,6 @@ async function loadData(){
         periode: r.fields[CONFIG.FIELD_MOIS] || "",
         paye: !!r.fields[CONFIG.FIELD_PAYE],
         date: r.fields[CONFIG.FIELD_DATE_PAIEMENT] || "",
-        relances: r.fields[CONFIG.FIELD_RELANCES] || 0,
       };
     });
     hideBanner();
@@ -249,23 +247,7 @@ async function togglePaid(clientId, periode){
   } catch (e) { showBanner("Échec de la mise à jour du paiement : " + e.message); }
 }
 
-async function markRelance(clientId, periode){
-  const existing = paymentFor(clientId, periode);
-  try {
-    if (existing) {
-      const newCount = (existing.relances || 0) + 1;
-      await airtableRequest(CONFIG.TABLE_PAIEMENTS, { method: "PATCH", path: `/${existing.id}`, body: { fields: { [CONFIG.FIELD_RELANCES]: newCount } } });
-      existing.relances = newCount;
-    } else {
-      const data = await airtableRequest(CONFIG.TABLE_PAIEMENTS, { method: "POST", body: { fields: {
-        [CONFIG.FIELD_PAIEMENT_LIEN]: [clientId], [CONFIG.FIELD_MOIS]: periode, [CONFIG.FIELD_PAYE]: false,
-        [CONFIG.FIELD_RELANCES]: 1,
-      }}});
-      state.payments.push({ id: data.id, clientId, periode, paye: false, date: "", relances: 1 });
-    }
-    render();
-  } catch (e) { showBanner("Échec de l'enregistrement de la relance : " + e.message); }
-}
+
 
 async function saveClient(form){
   const fields = {
@@ -426,7 +408,7 @@ function openEditModal(id){
   render();
 }
 function openDetail(id){ state.modal = { type: "detail", clientId: id }; render(); }
-function openInvoice(clientId, periode){ state.modal = { type: "invoice", clientId, periode }; render(); }
+function openInvoice(clientId, periode){ state.modal = { type: "invoice", clientId, periode, relance: false }; render(); }
 function closeModal(){ state.modal = null; render(); }
 
 function renderModal(){
@@ -481,10 +463,9 @@ function renderModal(){
         <div>
           ${periods.map(p => {
             const paid = isPaid(c.id, p);
-            const rel = (paymentFor(c.id, p) || {}).relances || 0;
             return `
             <div class="paymentrow">
-              <span style="font-size:13px;font-weight:600;">${periodLabel(p)} ${!paid && rel>0 ? `<span style="font-size:11px;font-weight:700;color:var(--danger);">· relancé ×${rel}</span>` : ""}</span>
+              <span style="font-size:13px;font-weight:600;">${periodLabel(p)}</span>
               <div style="display:flex;gap:8px;align-items:center;">
                 <button class="btn" onclick="togglePaid('${c.id}','${p}')" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;background:${paid?'var(--success)':'#fff'};color:${paid?'#fff':'var(--danger)'};border:1px solid ${paid?'var(--success)':'var(--danger)'};">
                   ${paid?"Payé ✓":"Marquer payé"}
@@ -511,7 +492,7 @@ function renderModal(){
     const ht = tarifTrimestreHT(c.volume);
     const ttc = tarifTrimestreTTC(c.volume);
     const tva = ttc - ht;
-    const relances = (paymentFor(c.id, periode) || {}).relances || 0;
+    const isRelance = !!state.modal.relance;
     div.innerHTML = `
     <div class="modal-overlay" onclick="closeModal()">
       <div class="modal" style="max-width:640px;padding:0;" onclick="event.stopPropagation()">
@@ -528,11 +509,10 @@ function renderModal(){
               </div>
             </div>
             <div style="text-align:right;">
-              <div class="disp" style="font-size:26px;font-weight:700;color:var(--ink);letter-spacing:0.02em;">FACTURE</div>
+              <div class="disp" style="font-size:26px;font-weight:700;color:var(--ink);letter-spacing:0.02em;">${isRelance ? "RELANCE — FACTURE" : "FACTURE"}</div>
               <div class="mono" style="font-size:12px;color:var(--muted);margin-top:4px;">N° ${invoiceNumber}</div>
               <div class="mono" style="font-size:12px;color:var(--muted);">${today}</div>
               <span class="stamp" style="color:${paid?'var(--success)':'var(--danger)'};margin-top:8px;display:inline-flex;">${paid?"Payé":"Non payé"}</span>
-              ${relances > 0 ? `<div class="stamp" style="color:var(--danger);margin-top:6px;display:inline-flex;">Relance n° ${relances}</div>` : ""}
             </div>
           </div>
           <div style="height:1px;background:linear-gradient(to right, rgba(22,24,28,0) 0%, var(--border) 14%, var(--border) 86%, rgba(22,24,28,0) 100%);margin-bottom:26px;"></div>
@@ -546,7 +526,7 @@ function renderModal(){
             <tbody>
               <tr>
                 <td style="padding:10px 12px;">Location garde-meuble — Box ${escapeHtml(c.box||"—")} · ${c.volume}m³<br/><span style="font-size:12px;color:var(--muted);">Période : ${periodLabel(periode)}</span></td>
-                <td class="mono" style="text-align:right;padding:10px 12px;">${formatEUR(ht)}</td>
+                <td class="mono" style="text-align:right;padding:10px 12px;font-weight:700;color:var(--blue-deep);">${formatEUR(ht)}</td>
               </tr>
               <tr>
                 <td style="color:var(--muted);padding:10px 12px;">TVA (${(CONFIG.TVA_RATE*100).toFixed(0)}%)</td>
@@ -562,9 +542,10 @@ function renderModal(){
           ${co.iban ? `<div style="margin-top:24px;font-size:12px;color:var(--muted);">Paiement par virement — IBAN : <span class="mono">${escapeHtml(co.iban)}</span></div>` : ""}
         </div>
         <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:16px 40px 24px;">
-          <div>
-            ${!paid ? `<button class="btn" onclick="markRelance('${c.id}','${periode}')" style="padding:9px 14px;border-radius:6px;background:transparent;border:1px solid var(--danger);color:var(--danger);font-size:13px;font-weight:600;">Marquer comme relancé${relances>0?` (relance n° ${relances+1})`:""}</button>` : ""}
-          </div>
+          <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;">
+            <input type="checkbox" ${isRelance ? "checked" : ""} onchange="state.modal.relance=this.checked; renderModal();" style="accent-color:var(--blue-deep);width:15px;height:15px;"/>
+            C'est une relance
+          </label>
           <div style="display:flex;gap:8px;">
             <button class="btn" onclick="closeModal()" style="padding:9px 16px;border-radius:6px;background:var(--bg);font-size:14px;">Fermer</button>
             <button class="btn" onclick="window.print()" style="padding:9px 18px;border-radius:6px;background:var(--primary);color:#fff;font-size:14px;font-weight:700;">Imprimer / PDF</button>
