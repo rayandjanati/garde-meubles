@@ -308,7 +308,8 @@ async function suggestNumero(){
   const maxDocs = fromDocs.reduce((m,e) => Math.max(m, extractNumeroInt(e.numero)), 0);
   const floor = MIN_NEXT_NUMERO[state.type] || 1;
   const next = Math.max(maxHistorical + 1, maxDocs + 1, floor);
-  state.numero = `${year}-${String(next).padStart(4,"0")}`;
+  const digits = state.type === "devis" ? 5 : 4;
+  state.numero = `${year}-${String(next).padStart(digits,"0")}`;
   renderForm(); renderPreview();
 }
 
