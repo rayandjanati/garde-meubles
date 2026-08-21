@@ -346,6 +346,15 @@ async function finalizeAndPrint(){
     console.error(e);
     showBanner("Le document n'a pas pu être enregistré dans l'historique en ligne (le numéro suivant risque de ne pas avancer). Détail : " + e.message);
   }
+  const docLabel = state.type === "devis" ? "Devis" : "Facture";
+  const safeName = (state.clientNom || "Client").replace(/[\\/:*?"<>|]/g, "").trim();
+  const originalTitle = document.title;
+  document.title = `${docLabel}-${safeName} N° ${state.numero}`;
+  window.addEventListener("afterprint", function resetTitle(){
+    document.title = originalTitle;
+    window.removeEventListener("afterprint", resetTitle);
+  });
+
   window.print();
 }
 
