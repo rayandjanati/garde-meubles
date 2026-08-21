@@ -331,16 +331,22 @@ async function searchClientHistory(query){
 }
 
 async function finalizeAndPrint(){
+  const docLabelConfirm = state.type === "devis" ? "devis" : "facture";
+  const confirmed = confirm(`Ceci va enregistrer définitivement ce ${docLabelConfirm} (N° ${state.numero}) dans le registre et faire avancer le prochain numéro. Continuer ?`);
+  if (!confirmed) return;
+
+  const pureNumero = (state.numero.split("-")[1] || state.numero); // enlève le préfixe année pour le registre
+
   try {
     if (state.clientNom) {
       const data = await airtableRequest({ method: "POST", body: { fields: {
         [AIRTABLE_CONFIG.FIELD_TYPE]: state.type === "devis" ? "Devis" : "Facture",
-        [AIRTABLE_CONFIG.FIELD_NUMERO]: state.numero,
+        [AIRTABLE_CONFIG.FIELD_NUMERO]: pureNumero,
         [AIRTABLE_CONFIG.FIELD_CLIENT]: state.clientNom,
         [AIRTABLE_CONFIG.FIELD_DATE]: state.date,
       }}});
       if (airtableDocsCache) {
-        airtableDocsCache.push({ id: data.id, type: state.type, numero: state.numero, nom: state.clientNom });
+        airtableDocsCache.push({ id: data.id, type: state.type, numero: pureNumero, nom: state.clientNom });
       }
     }
   } catch(e) {
