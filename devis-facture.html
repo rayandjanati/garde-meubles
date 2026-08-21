@@ -439,6 +439,11 @@ function renderForm(){
       <div class="field"><label>TVA (%)</label><input type="number" value="${state.tvaRate}" oninput="state.tvaRate=this.value; renderPreview();"/></div>
     </div>
 
+    ${state.type === 'devis' ? `
+      ${sectionHeader("Conditions", "conditions")}
+      ${state.sections.conditions ? `<div class="field"><textarea rows="4" oninput="state.conditionsPaiement=this.value; renderPreview();">${escapeHtml(state.conditionsPaiement)}</textarea></div>` : ""}
+    ` : ""}
+
     <button class="printbtn" onclick="finalizeAndPrint()">Imprimer / Exporter en PDF</button>
   `;
   renderItems();
@@ -466,8 +471,6 @@ function renderDevisFields(){
         Afficher la ligne « Fourniture et livraison de : »
       </label>
       <div id="services-list"></div><button class="addbtn" onclick="addService()">+ Ajouter une prestation</button>` : ""}
-    ${sectionHeader("Conditions", "conditions")}
-    ${state.sections.conditions ? `<div class="field"><textarea rows="4" oninput="state.conditionsPaiement=this.value; renderPreview();">${escapeHtml(state.conditionsPaiement)}</textarea></div>` : ""}
   `;
 }
 function renderFactureFields(){
