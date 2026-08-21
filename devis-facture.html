@@ -340,16 +340,34 @@ function handleClientLookup(value){
     if (!result) { box.innerHTML = ""; return; }
     const totalDevis = result.devis.length, totalFactures = result.factures.length;
     if (totalDevis === 0 && totalFactures === 0) {
-      box.innerHTML = `<div style="font-size:12px;color:var(--muted);padding:8px 10px;background:#F2F1EC;border-radius:6px;margin:-4px 0 12px;">Nouveau client — aucun historique trouvé.</div>`;
+      box.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:9px 12px;background:#F2F1EC;border-radius:7px;margin:-4px 0 14px;">
+          <span style="width:16px;height:16px;border-radius:50%;background:#DAD7CC;flex-shrink:0;"></span>
+          Nouveau client — aucun historique trouvé.
+        </div>`;
       return;
     }
-    const lastDevis = result.devis.slice(-3).reverse().map(e=>e.numero).join(", ");
-    const lastFactures = result.factures.slice(-3).reverse().map(e=>e.numero).join(", ");
+    const numeroBadges = (list) => list.slice(-4).reverse().map(e =>
+      `<span style="display:inline-block;background:#fff;border:1px solid var(--blue-tint);color:var(--blue-deep);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin:2px 4px 2px 0;">${escapeHtml(e.numero)}</span>`
+    ).join("");
     box.innerHTML = `
-      <div style="font-size:12px;color:var(--blue-deep);background:var(--blue-tint);padding:8px 10px;border-radius:6px;margin:-4px 0 12px;line-height:1.6;">
-        <b>Client existant</b> — ${totalDevis} devis, ${totalFactures} facture${totalFactures>1?"s":""}.<br/>
-        ${totalDevis ? `Derniers devis n° ${lastDevis}<br/>` : ""}
-        ${totalFactures ? `Dernières factures n° ${lastFactures}` : ""}
+      <div style="background:var(--blue-tint);border-radius:8px;padding:12px 14px;margin:-4px 0 14px;">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px;">
+          <span style="width:16px;height:16px;border-radius:50%;background:var(--blue);flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;color:var(--blue-deep);">Client existant</span>
+        </div>
+        ${totalDevis ? `
+          <div style="margin-bottom:${totalFactures ? '8px' : '0'};">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;">${totalDevis} devis</div>
+            <div>${numeroBadges(result.devis)}</div>
+          </div>` : ""}
+        ${totalFactures ? `
+          <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;">${totalFactures} facture${totalFactures>1?"s":""}</div>
+            <div>${numeroBadges(result.factures)}</div>
+          </div>` : ""}
       </div>`;
   }, 250);
 }
