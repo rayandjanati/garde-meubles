@@ -125,6 +125,22 @@
   .footer-contact .txt { font-size: 10px; line-height: 1.4; color: #2B2B27; }
   .footer-contact .txt .lbl { display: block; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 1px; }
 
+  .registre-overlay { position: fixed; inset: 0; background: rgba(14,20,28,0.55); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 100; }
+  .registre-modal { background: #fff; border-radius: 12px; width: 100%; max-width: 920px; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; }
+  .registre-header { padding: 20px 24px 14px; border-bottom: 1px solid var(--sidebar-line); }
+  .registre-title { font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 700; color: var(--ink); }
+  .registre-tabs { display: flex; gap: 6px; margin: 14px 0 10px; background: #EAE8E0; padding: 4px; border-radius: 8px; width: fit-content; }
+  .registre-tabs button { padding: 8px 18px; border: none; background: transparent; color: #8A857A; font-weight: 700; cursor: pointer; border-radius: 6px; font-size: 13px; font-family: 'Space Grotesk', sans-serif; }
+  .registre-tabs button.active { background: var(--blue); color: #fff; }
+  .registre-search { width: 100%; padding: 10px 13px; border: 1px solid var(--sidebar-line); border-radius: 7px; font-size: 14px; font-family: 'Inter', sans-serif; }
+  .registre-count { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .registre-body { flex: 1; overflow-y: auto; padding: 0 24px 20px; }
+  .registre-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .registre-table th { position: sticky; top: 0; background: #fff; text-align: left; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 8px 6px; border-bottom: 1.4px solid var(--ink); }
+  .registre-table td { padding: 9px 6px; font-size: 13.5px; border-bottom: 1px solid var(--line); color: #2B2B27; }
+  .registre-table td.num { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--blue-deep); white-space: nowrap; }
+  .registre-close { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 22px; line-height: 1; padding: 4px 8px; }
+
   @page { size: A4; margin: 0; }
   @media print {
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
@@ -145,7 +161,10 @@
 <div class="layout">
   <div class="formcol no-print">
     <div class="brand-eyebrow">France Perse Monaco</div>
-    <div class="form-title">Devis & Facturation</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;">
+      <div class="form-title" style="margin-bottom:0;">Devis & Facturation</div>
+      <button class="btn" onclick="openRegistre()" style="padding:7px 12px;border-radius:6px;background:#fff;border:1px solid var(--sidebar-line);font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;">📋 Registre</button>
+    </div>
     <div id="form"></div>
   </div>
   <div class="previewcol"><div class="page" id="preview"></div></div>
@@ -478,6 +497,65 @@ function addService(){ state.services.push(""); renderItems(); renderPreview(); 
 function removeService(i){ state.services.splice(i,1); renderItems(); renderPreview(); }
 
 async function setType(t){ state.type = t; await suggestNumero(); renderForm(); renderPreview(); }
+
+// ---------- Registre complet (historique + Airtable) ----------
+let registreState = { tab: "facture", search: "" };
+
+async function openRegistre(){
+  await ensureAirtableLoaded();
+  registreState = { tab: "facture", search: "" };
+  renderRegistre();
+}
+function closeRegistre(){
+  const el = document.getElementById("registre-root");
+  if (el) el.remove();
+}
+function setRegistreTab(t){ registreState.tab = t; renderRegistre(); }
+
+function getRegistreList(type){
+  const historical = HISTORICAL_ARCHIVE[type === "devis" ? "devis" : "factures"] || [];
+  const fromDocs = (airtableDocsCache || []).filter(d => d.type === type);
+  const combined = [...historical, ...fromDocs];
+  return combined.sort((a,b) => extractNumeroInt(b.numero) - extractNumeroInt(a.numero));
+}
+
+function renderRegistre(){
+  const old = document.getElementById("registre-root");
+  if (old) old.remove();
+
+  const list = getRegistreList(registreState.tab);
+  const q = normalizeStr(registreState.search);
+  const filtered = q.length >= 1 ? list.filter(e => normalizeStr(e.nom).includes(q) || normalizeStr(e.numero).includes(q)) : list;
+
+  const div = document.createElement("div");
+  div.id = "registre-root";
+  div.innerHTML = `
+    <div class="registre-overlay" onclick="closeRegistre()">
+      <div class="registre-modal" onclick="event.stopPropagation()">
+        <div class="registre-header">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="registre-title">Registre complet</div>
+            <button class="registre-close" onclick="closeRegistre()">✕</button>
+          </div>
+          <div class="registre-tabs">
+            <button class="${registreState.tab==='facture'?'active':''}" onclick="setRegistreTab('facture')">Factures</button>
+            <button class="${registreState.tab==='devis'?'active':''}" onclick="setRegistreTab('devis')">Devis</button>
+          </div>
+          <input class="registre-search" placeholder="Rechercher un nom ou un numéro..." value="${escapeHtml(registreState.search)}" oninput="registreState.search=this.value; renderRegistre();" />
+          <div class="registre-count">${filtered.length} ${registreState.tab === 'facture' ? 'facture' : 'devis'}${filtered.length>1 && registreState.tab==='facture'?'s':''}${q ? ` (sur ${list.length} au total)` : ''}</div>
+        </div>
+        <div class="registre-body">
+          <table class="registre-table">
+            <thead><tr><th style="width:110px;">N°</th><th>Client</th></tr></thead>
+            <tbody>
+              ${filtered.map(e => `<tr><td class="num">${escapeHtml(e.numero)}</td><td>${escapeHtml(e.nom)}</td></tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(div);
+}
 
 function renderPreview(){
   const p = document.getElementById("preview");
