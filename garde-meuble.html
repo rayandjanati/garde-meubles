@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Garde-meuble — Suivi & Facturation</title>
+<title>Garde-meubles — Suivi & Facturation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
 <style>
@@ -109,7 +109,7 @@
   };
 
   // Registre commun des factures : même base Airtable que le fichier Devis / Facture.
-  // Les clients et paiements du garde-meuble restent dans leur base actuelle.
+  // Les clients et paiements du garde-meubles restent dans leur base actuelle.
   const INVOICE_REGISTRY_CONFIG = {
     AIRTABLE_TOKEN: "patZjWlWadNyIvY6J.ed57059754fd51c5810bb1db45f7fa26bc2d66efdaf9f78ab20612dc477eb282",
     BASE_ID: "appNDdC64VzEOjviU",
@@ -345,7 +345,7 @@ function render(){
       <div class="header-brand">
         <img class="header-logo" src="${LOGO_DATA_URI}" alt="France Perse Monaco" />
         <div>
-          <div class="header-title">Garde-meuble</div>
+          <div class="header-title">Garde-meubles</div>
           <div class="disp" style="font-size:20.5px;font-weight:600;color:var(--ink);">Suivi & Facturation trimestrielle</div>
         </div>
       </div>
@@ -555,7 +555,7 @@ async function saveSharedInvoiceNumber(c, periode, invoiceNumber) {
   const pureNumero = invoiceNumber.split("-")[1];
   const date = new Date().toISOString().slice(0, 10);
   const data = {
-    source: "garde-meuble", clientId: c.id, box: c.box || "", periode, numero: invoiceNumber,
+    source: "garde-meubles", clientId: c.id, box: c.box || "", periode, numero: invoiceNumber,
     situation: modalInvoiceSituationForSave(c.id, periode)
   };
   const fields = {
@@ -607,8 +607,8 @@ function invoiceContentHTML(c, periode, isRelance, adresse, showStamp){
       .fpd-stamp { display:inline-flex; margin-top:10px; padding:3px 10px; border:2px solid currentColor; border-radius:3px; font-family:'Space Grotesk',sans-serif; font-weight:700; letter-spacing:.06em; font-size:13px; text-transform:uppercase; transform:rotate(-2deg); }
       .fpd-client { text-align:right; max-width:270px; }
       .fpd-client-label { font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:#9CA3AF; margin-bottom:5px; }
-      .fpd-client-name { font-size:20px; font-weight:700; }
-      .fpd-client-addr { font-size:14.5px; font-weight:700; color:#16181C; line-height:1.3; margin-top:0; }
+      .fpd-client-name { font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; }
+      .fpd-client-addr { font-family:'Space Grotesk',sans-serif; font-size:14.5px; font-weight:700; color:#16181C; line-height:1.3; margin-top:0; }
       .fpd-client-sub { font-size:13.5px; color:#767066; margin-top:6px; }
       .fpd-section-label { font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:700; color:#0166FF; margin:18px 0 6px; }
       .fpd-body-text { font-size:14px; line-height:1.5; color:#2B2B27; }
@@ -661,7 +661,6 @@ function invoiceContentHTML(c, periode, isRelance, adresse, showStamp){
           ${showStamp ? `<div><span class="fpd-stamp" style="color:#C0511F;">Non payé</span></div>` : ""}
         </div>
         <div class="fpd-client">
-          <div class="fpd-client-label">Facturé à</div>
           <div class="fpd-client-name">${escapeHtml(c.nom)}</div>
           ${adresse ? `<div class="fpd-client-addr">${escapeHtml(adresse).replace(/\n/g,"<br/>")}</div>` : ""}
           <div class="fpd-client-sub">${escapeHtml(c.telephone||"")}${c.email?` · ${escapeHtml(c.email)}`:""}</div>
@@ -670,12 +669,12 @@ function invoiceContentHTML(c, periode, isRelance, adresse, showStamp){
       <div class="fpd-section-label">Objet</div>
       <div class="fpd-body-text">${isRelance
         ? `Sauf erreur ou omission de notre part, la facture ci-dessous reste à ce jour impayée. Nous vous remercions de bien vouloir procéder à son règlement dans les meilleurs délais.`
-        : `La présente facture concerne la location de votre garde-meuble pour la période ${invoicePeriodLabel(c.dateDebut, periode)}.`}</div>
+        : `La présente facture concerne la location de votre garde-meubles pour la période ${invoicePeriodLabel(c.dateDebut, periode)}.`}</div>
       <table class="fpd-items">
         <thead><tr><td>Description des prestations</td></tr></thead>
         <tbody>
           <tr>
-            <td>Location garde-meuble · ${c.volume}m³<br/><span class="fpd-sub">${c.volume}m³ × ${formatEUR(CONFIG.PRICE_PER_M3)} H.T./mois = ${formatEUR(ht/3)} H.T./mois<br/>Soit ${formatEUR(ht)} H.T. pour 3 mois</span><br/><span class="fpd-sub">Période : ${invoicePeriodLabel(c.dateDebut, periode)}</span></td>
+            <td>Location garde-meubles · ${c.volume}m³<br/><span class="fpd-sub">${c.volume}m³ × ${formatEUR(CONFIG.PRICE_PER_M3)} H.T./mois = ${formatEUR(ht/3)} H.T./mois<br/>Soit ${formatEUR(ht)} H.T. pour 3 mois</span><br/><span class="fpd-sub">Période : ${invoicePeriodLabel(c.dateDebut, periode)}</span></td>
           </tr>
         </tbody>
       </table>
@@ -699,7 +698,7 @@ function invoiceContentHTML(c, periode, isRelance, adresse, showStamp){
       ` : `<div class="fpd-payment-note">Valeur en votre aimable règlement</div>`}
       ${co.iban ? `<div class="fpd-iban">Paiement par virement — IBAN : ${escapeHtml(co.iban)}</div>` : ""}
       <div class="fpd-body-text" style="margin-top:16px;">Nous vous remercions de votre confiance et vous prions d'agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</div>
-      <div class="fpd-mention">Les loyers de garde-meuble se règlent par trimestre d'avance.</div>
+      <div class="fpd-mention">Les loyers de garde-meubles se règlent par trimestre d'avance.</div>
       <div class="fpd-footer-legal">${escapeHtml(co.mentionLegale||"")}</div>
     </div>`;
 }
