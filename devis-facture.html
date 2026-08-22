@@ -62,7 +62,7 @@
   }
   .pages-stack { display: flex; flex-direction: column; align-items: center; gap: 28px; }
   #page-inner, .page-inner { padding: 10mm 16mm 8mm; box-sizing: border-box;
-    display: flex; flex-direction: column; min-height: 100%; }
+    display: flex; flex-direction: column; min-height: 100%; transform-origin: top left; }
   .continuation-label { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 4px 0 16px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
   .doc-content { flex: 1 0 auto; }
 
@@ -782,7 +782,7 @@ function renderPreview(){
   const preview = document.getElementById("preview");
   preview.innerHTML = buildSinglePageHTML(docTitle, introHtml, rows);
 
-  if (tryFitSinglePage() || rows.length === 0) return;
+  if (tryFitSinglePage() !== "overflow" || rows.length === 0) return;
 
   paginateAndRender(docTitle, introHtml, rows);
 }
@@ -790,8 +790,10 @@ function renderPreview(){
 function tryFitSinglePage(){
   const pageEl = document.querySelector(".page");
   const inner = document.getElementById("page-inner");
-  if (!pageEl || !inner) return false;
+  if (!pageEl || !inner) return "overflow";
 
+  inner.style.transform = "none";
+  inner.style.width = "100%";
   pageEl.style.height = "";
   pageEl.style.overflow = "hidden";
   adjustTopReserve();
@@ -801,7 +803,28 @@ function tryFitSinglePage(){
   const pageHeight = pageEl.clientHeight - footerHeight;
   const naturalHeight = inner.scrollHeight;
 
-  return naturalHeight <= pageHeight;
+  if (naturalHeight <= pageHeight) return "fits";
+
+  // Ne rentre pas tel quel : on réduit le texte, mais jamais sous ~10px
+  // (référence : corps de texte à 14.5px), avant de basculer en pagination.
+  const BASE_FONT = 14.5;
+  const MIN_FONT = 10;
+  const FLOOR = MIN_FONT / BASE_FONT;
+
+  let scale = Math.max(pageHeight / naturalHeight, FLOOR);
+  inner.style.width = (100 / scale) + "%";
+  const widenedHeight = inner.scrollHeight;
+  scale = Math.max(pageHeight / widenedHeight, FLOOR);
+  inner.style.width = (100 / scale) + "%";
+  inner.style.transform = `scale(${scale})`;
+
+  if (widenedHeight * scale > pageHeight + 2) {
+    // Même à la taille minimale, ça ne tient pas : on repasse en pagination.
+    inner.style.transform = "none";
+    inner.style.width = "100%";
+    return "overflow";
+  }
+  return "shrunk";
 }
 
 function measureContinuationOverhead(docTitle){
