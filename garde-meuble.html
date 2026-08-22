@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Garde-meuble — Suivi & Facturation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
     --bg: #F0EFEA; --surface: #FFFFFF; --ink: #16181C; --muted: #767066;
@@ -16,7 +16,7 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; }
   .disp { font-family: 'Space Grotesk', sans-serif; }
-  .mono { font-family: 'Space Mono', monospace; }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
   .stamp { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 2px solid currentColor; border-radius: 3px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: 0.06em; font-size: 12px; text-transform: uppercase; transform: rotate(-2deg); }
   .btn { cursor: pointer; border: none; font-family: 'Inter', sans-serif; font-weight: 600; transition: opacity .15s, transform .1s; }
   .btn:hover { opacity: 0.88; } .btn:active { transform: scale(0.97); } .btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -454,7 +454,7 @@ function invoiceContentHTML(c, periode, isRelance){
             <thead><tr><th style="background:var(--navy);color:#fff;padding:9px 12px;border-radius:6px 0 0 0;">Description</th><th style="background:var(--navy);color:#fff;text-align:right;padding:9px 12px;border-radius:0 6px 0 0;">Montant</th></tr></thead>
             <tbody>
               <tr>
-                <td style="padding:10px 12px;">Location garde-meuble — Box ${escapeHtml(c.box||"—")} · ${c.volume}m³<br/><span style="font-size:12px;color:var(--muted);">Période : ${periodLabel(periode)}</span></td>
+                <td style="padding:10px 12px;">Location garde-meuble — Box ${escapeHtml(c.box||"—")} · <span class="mono">${c.volume}m³</span><br/><span style="font-size:12px;color:var(--muted);">Période : ${periodLabel(periode)}</span></td>
                 <td class="mono" style="text-align:right;padding:10px 12px;font-weight:700;color:var(--blue-deep);">${formatEUR(ht)}</td>
               </tr>
               <tr>
@@ -491,13 +491,13 @@ function printInvoice(clientId, periode, isRelance){
 <html lang="fr"><head><meta charset="UTF-8" />
 <title>Facture — ${escapeHtml(c.nom)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
 <style>
   :root { --ink:#16181C; --muted:#767066; --border:#E4E1D8; --blue:#0166FF; --blue-deep:#0057D9; --navy:#0E2A3E; --success:#2E7D4F; --danger:#C0511F; }
   * { box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   body { margin:0; font-family:'Inter',sans-serif; color:var(--ink); background:#fff; }
   .disp { font-family:'Space Grotesk',sans-serif; }
-  .mono { font-family:'Space Mono',monospace; }
+  .mono { font-family:'IBM Plex Mono',monospace; }
   .stamp { display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border:2px solid currentColor; border-radius:3px; font-family:'Space Grotesk',sans-serif; font-weight:700; letter-spacing:0.06em; font-size:12px; text-transform:uppercase; transform:rotate(-2deg); }
   .invoice-table { width:100%; border-collapse:collapse; margin-bottom:20px; }
   .invoice-table td { padding:12px 4px; font-size:14px; border-bottom:1px solid var(--border); }
