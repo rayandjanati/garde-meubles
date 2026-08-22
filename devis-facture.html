@@ -182,6 +182,7 @@
     FIELD_NUMERO: "Numero",
     FIELD_CLIENT: "Client",
     FIELD_DATE: "Date",
+    FIELD_DATA: "Donnees",
   };
 </script>
 <div id="banner" style="display:none;background:#FBEDE4;color:#8A3A15;padding:8px 28px;font-size:13px;"></div>
@@ -203,31 +204,48 @@ const COMPANY = {
   mentionLegale: "S.A.R.L. DJANATI CHOULABI  ·  R.C.I 06 S 04588  ·  D.S.E.E. 602N 12300 Intra.FR 35 00007589 4",
 };
 
-let state = {
-  type: "devis",
-  numero: "",
-  date: new Date().toISOString().slice(0,10),
-  clientNom: "",
-  clientAdresse: "",
-  tvaRate: 20,
+function defaultState(){
+  return {
+    type: "devis",
+    numero: "",
+    date: new Date().toISOString().slice(0,10),
+    clientNom: "",
+    clientAdresse: "",
+    tvaRate: 20,
 
-  intro: "Nous vous remercions de nous avoir consultés pour le transport (déménagement) de l'ensemble de vos mobiliers selon inventaire établi par nos soins lors de notre visite. L'intervention est prévue en date du [DATES] à destination de [ADRESSE].",
-  services: [
-    "Fourniture de matériel",
-    "Emballage des mobiliers, tableaux, bibelots, vaisselles, vêtements, livres, lustres, démontage, remontage, chargement, transport, déchargement et mise en place des mobiliers",
-    "Frais de stationnement inclus",
-  ],
-  conditionsPaiement: "Nous vous serons reconnaissant de bien vouloir nous indiquer votre décision, dès que possible, soit par mail, soit par courrier, et de nous retourner un exemplaire du devis muni de votre acceptation accompagné d'un chèque d'acompte de 50% ou d'une preuve de paiement (solde à la livraison) pour réserver l'intervention.",
+    intro: "Nous vous remercions de nous avoir consultés pour le transport (déménagement) de l'ensemble de vos mobiliers selon inventaire établi par nos soins lors de notre visite. L'intervention est prévue en date du [DATES] à destination de [ADRESSE].",
+    services: [
+      "Fourniture de matériel",
+      "Emballage des mobiliers, tableaux, bibelots, vaisselles, vêtements, livres, lustres, démontage, remontage, chargement, transport, déchargement et mise en place des mobiliers",
+      "Frais de stationnement inclus",
+    ],
+    conditionsPaiement: "Nous vous serons reconnaissant de bien vouloir nous indiquer votre décision, dès que possible, soit par mail, soit par courrier, et de nous retourner un exemplaire du devis muni de votre acceptation accompagné d'un chèque d'acompte de 50% ou d'une preuve de paiement (solde à la livraison) pour réserver l'intervention.",
 
-  reference: "",
-  objet: "",
-  specialMention: "",
+    reference: "",
+    objet: "",
+    specialMention: "",
 
-  items: [ "" ],
-  montantGlobalHT: "",
+    items: [ "" ],
+    montantGlobalHT: "",
 
-  sections: { intro: true, services: true, conditions: true, reference: true, objet: true, fourniture: true },
-};
+    sections: { intro: true, services: true, conditions: true, reference: true, objet: true, fourniture: true },
+
+    editingId: null, // id Airtable du document en cours de modification (null = nouveau document)
+  };
+}
+
+let state = defaultState();
+
+function newDocument(){
+  const keepType = state.type;
+  state = defaultState();
+  state.type = keepType;
+  closeRegistre();
+  suggestNumero();
+  renderForm();
+  renderPreview();
+}
+
 
 function formatEUR(n){ return (Number(n)||0).toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2}) + " €"; }
 function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
@@ -276,6 +294,7 @@ async function loadAirtableDocs(){
     type: (r.fields[AIRTABLE_CONFIG.FIELD_TYPE] || "").toLowerCase() === "devis" ? "devis" : "facture",
     numero: r.fields[AIRTABLE_CONFIG.FIELD_NUMERO] || "",
     nom: r.fields[AIRTABLE_CONFIG.FIELD_CLIENT] || "",
+    data: r.fields[AIRTABLE_CONFIG.FIELD_DATA] || null,
   }));
 }
 
@@ -332,21 +351,36 @@ async function searchClientHistory(query){
 
 async function finalizeAndPrint(){
   const docLabelConfirm = state.type === "devis" ? "devis" : "facture";
-  const confirmed = confirm(`Ceci va enregistrer définitivement ce ${docLabelConfirm} (N° ${state.numero}) dans le registre et faire avancer le prochain numéro. Continuer ?`);
+  const isEditing = !!state.editingId;
+  const confirmMsg = isEditing
+    ? `Ceci va mettre à jour ce ${docLabelConfirm} existant (N° ${state.numero}). Continuer ?`
+    : `Ceci va enregistrer définitivement ce ${docLabelConfirm} (N° ${state.numero}) dans le registre et faire avancer le prochain numéro. Continuer ?`;
+  const confirmed = confirm(confirmMsg);
   if (!confirmed) return;
 
-  const pureNumero = (state.numero.split("-")[1] || state.numero); // enlève le préfixe année pour le registre
+  const pureNumero = isEditing ? state.numero : (state.numero.split("-")[1] || state.numero); // garde le numéro tel quel en édition
 
   try {
     if (state.clientNom) {
-      const data = await airtableRequest({ method: "POST", body: { fields: {
+      const stateCopy = { ...state, editingId: undefined };
+      const fields = {
         [AIRTABLE_CONFIG.FIELD_TYPE]: state.type === "devis" ? "Devis" : "Facture",
         [AIRTABLE_CONFIG.FIELD_NUMERO]: pureNumero,
         [AIRTABLE_CONFIG.FIELD_CLIENT]: state.clientNom,
         [AIRTABLE_CONFIG.FIELD_DATE]: state.date,
-      }}});
-      if (airtableDocsCache) {
-        airtableDocsCache.push({ id: data.id, type: state.type, numero: pureNumero, nom: state.clientNom });
+        [AIRTABLE_CONFIG.FIELD_DATA]: JSON.stringify(stateCopy),
+      };
+      if (isEditing) {
+        await airtableRequest({ method: "PATCH", path: `/${state.editingId}`, body: { fields } });
+        if (airtableDocsCache) {
+          const existing = airtableDocsCache.find(d => d.id === state.editingId);
+          if (existing) { existing.numero = pureNumero; existing.nom = state.clientNom; existing.data = fields[AIRTABLE_CONFIG.FIELD_DATA]; }
+        }
+      } else {
+        const data = await airtableRequest({ method: "POST", body: { fields } });
+        if (airtableDocsCache) {
+          airtableDocsCache.push({ id: data.id, type: state.type, numero: pureNumero, nom: state.clientNom, data: fields[AIRTABLE_CONFIG.FIELD_DATA] });
+        }
       }
     }
   } catch(e) {
@@ -414,6 +448,11 @@ function totalTTC(){ return totalHT() + totalTVA(); }
 function renderForm(){
   const f = document.getElementById("form");
   f.innerHTML = `
+    ${state.editingId ? `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--blue-tint);color:var(--blue-deep);padding:9px 12px;border-radius:7px;font-size:12.5px;font-weight:600;margin-bottom:14px;">
+        <span>✏️ Modification du document N° ${escapeHtml(state.numero)}</span>
+        <button class="btn" onclick="newDocument()" style="padding:4px 10px;border-radius:5px;background:#fff;color:var(--blue-deep);font-size:11.5px;">+ Nouveau</button>
+      </div>` : ""}
     <div class="toggle">
       <button class="${state.type==='devis'?'active':''}" onclick="setType('devis')">Devis</button>
       <button class="${state.type==='facture'?'active':''}" onclick="setType('facture')">Facture</button>
@@ -565,15 +604,34 @@ function renderRegistre(){
         </div>
         <div class="registre-body">
           <table class="registre-table">
-            <thead><tr><th style="width:110px;">N°</th><th>Client</th></tr></thead>
+            <thead><tr><th style="width:110px;">N°</th><th>Client</th><th style="width:90px;"></th></tr></thead>
             <tbody>
-              ${filtered.map(e => `<tr><td class="num">${escapeHtml(e.numero)}</td><td>${escapeHtml(e.nom)}</td></tr>`).join("")}
+              ${filtered.map(e => `<tr>
+                <td class="num">${escapeHtml(e.numero)}</td>
+                <td>${escapeHtml(e.nom)}</td>
+                <td>${e.id && e.data ? `<button class="btn" onclick="editDocument('${e.id}')" style="padding:4px 10px;border-radius:5px;background:var(--blue-tint);color:var(--blue-deep);font-size:11.5px;font-weight:600;">Modifier</button>` : ""}</td>
+              </tr>`).join("")}
             </tbody>
           </table>
         </div>
       </div>
     </div>`;
   document.body.appendChild(div);
+}
+
+function editDocument(id){
+  const doc = (airtableDocsCache || []).find(d => d.id === id);
+  if (!doc || !doc.data) { alert("Le contenu détaillé de ce document n'est pas disponible (probablement un document de l'historique importé, sans détails enregistrés)."); return; }
+  try {
+    const saved = JSON.parse(doc.data);
+    state = { ...defaultState(), ...saved, editingId: id };
+    closeRegistre();
+    renderForm();
+    renderPreview();
+  } catch(e) {
+    console.error(e);
+    alert("Impossible de recharger ce document — les données enregistrées sont peut-être corrompues.");
+  }
 }
 
 function renderPreview(){
