@@ -738,7 +738,7 @@ async function printInvoice(clientId, periode, isRelance){
     : "prochain numéro disponible";
 
   const ok = confirm(
-    `Créer la facture ${displayedNumber} pour ${c.nom} ?\\n\\n` +
+    `Créer la facture ${displayedNumber} pour ${c.nom} ?\n\n` +
     `La facture sera enregistrée dans le registre commun et le numéro sera définitivement attribué.`
   );
   if (!ok) return;
