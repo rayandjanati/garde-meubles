@@ -733,6 +733,16 @@ async function printInvoice(clientId, periode, isRelance){
   const modal = (state.modal && state.modal.type === "invoice") ? state.modal : null;
   if (!modal) return;
 
+  const displayedNumber = modal.invoiceNumber && modal.invoiceNumber !== "—"
+    ? modal.invoiceNumber
+    : "prochain numéro disponible";
+
+  const ok = confirm(
+    `Créer la facture ${displayedNumber} pour ${c.nom} ?\\n\\n` +
+    `La facture sera enregistrée dans le registre commun et le numéro sera définitivement attribué.`
+  );
+  if (!ok) return;
+
   // Attribution définitive uniquement au moment de l'impression.
   // On relit le registre pour garantir que le numéro est toujours le prochain disponible.
   if (!modal.registrySaved) {
