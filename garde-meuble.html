@@ -554,7 +554,7 @@ function renderModal(){
     const periods = lastNPeriodsForClient(c.dateDebut, 4);
     div.innerHTML = `
     <div class="modal-overlay no-print" onclick="closeModal()">
-      <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal" style="max-width:580px;" onclick="event.stopPropagation()">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
             <div class="disp" style="font-size:33px;font-weight:800;">${escapeHtml(c.nom)}</div>
@@ -572,7 +572,7 @@ function renderModal(){
             const paid = isPaid(c.id, p);
             return `
             <div class="paymentrow">
-              <span style="font-size:18px;font-weight:600;">${periodLabel(p)}</span>
+              <span style="font-size:18px;font-weight:600;white-space:nowrap;">${periodLabel(p)}</span>
               <div style="display:flex;gap:8px;align-items:center;">
                 <button class="btn" onclick="togglePaid('${c.id}','${p}')" style="padding:5px 12px;border-radius:6px;font-size:17px;font-weight:700;background:${paid?'var(--success)':'#fff'};color:${paid?'#fff':'var(--danger)'};border:1px solid ${paid?'var(--success)':'var(--danger)'};">
                   ${paid?"Payé ✓":"Marquer payé"}
