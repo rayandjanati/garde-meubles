@@ -17,7 +17,7 @@
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; }
   .disp { font-family: 'Space Grotesk', sans-serif; }
   .mono { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-variant-numeric: tabular-nums; }
-  .stamp { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 2px solid currentColor; border-radius: 3px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: 0.06em; font-size: 12px; text-transform: uppercase; transform: rotate(-2deg); }
+  .stamp { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 2px solid currentColor; border-radius: 3px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: 0.06em; font-size: 14px; text-transform: uppercase; transform: rotate(-2deg); }
   .btn { cursor: pointer; border: none; font-family: 'Inter', sans-serif; font-weight: 600; transition: opacity .15s, transform .1s; }
   .btn:hover { opacity: 0.88; } .btn:active { transform: scale(0.97); } .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   input, textarea { font-family: 'Inter', sans-serif; }
@@ -25,20 +25,20 @@
   .header { background: #fff; border-bottom: 1px solid var(--border); color: var(--ink); padding: 20px 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
   .header-brand { display: flex; align-items: center; gap: 14px; }
   .header-logo { height: 44px; display: block; }
-  .header-title { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-  .tabbtn { padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px; font-weight: 600; background: #fff; color: var(--ink); }
+  .header-title { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .tabbtn { padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); font-size: 15px; font-weight: 600; background: #fff; color: var(--ink); }
   .tabbtn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
   .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
   .statcard { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
-  .statlabel { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
-  .statvalue { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .statlabel { font-size: 12.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .statvalue { font-size: 25.5px; font-weight: 700; margin-top: 4px; }
   .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
-  .search { flex: 1 1 220px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: #fff; }
-  .filterbtn { padding: 8px 14px; border-radius: 6px; font-size: 13px; background: #fff; color: var(--ink); border: 1px solid var(--border); font-weight: 600; }
+  .search { flex: 1 1 220px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 16px; background: #fff; }
+  .filterbtn { padding: 8px 14px; border-radius: 6px; font-size: 15px; background: #fff; color: var(--ink); border: 1px solid var(--border); font-weight: 600; }
   .filterbtn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
   .clients-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; table-layout: fixed; }
-  .clients-table th { text-align: left; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; padding: 11px 14px; background: var(--navy); }
-  .clients-table td { padding: 11px 14px; font-size: 13.5px; border-bottom: 1px solid var(--border); }
+  .clients-table th { text-align: left; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; padding: 11px 14px; background: var(--navy); }
+  .clients-table td { padding: 11px 14px; font-size: 15.5px; border-bottom: 1px solid var(--border); }
   .clients-table tr:last-child td { border-bottom: none; }
   .clients-table tbody tr { cursor: pointer; transition: background .1s; }
   .clients-table tbody tr:nth-child(even) { background: #FAFAF7; }
@@ -54,13 +54,13 @@
   .modal-overlay { position: fixed; inset: 0; background: rgba(14,20,28,0.55); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
   .modal { background: #fff; border-radius: 10px; padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
   .field { display: grid; gap: 4px; margin-bottom: 10px; }
-  .field label { font-size: 12px; font-weight: 600; color: var(--muted); }
-  .field input, .field textarea { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; width: 100%; }
+  .field label { font-size: 14px; font-weight: 600; color: var(--muted); }
+  .field input, .field textarea { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 16px; width: 100%; }
   .paymentrow { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #F7F6F3; border-radius: 6px; margin-bottom: 6px; }
   .invoice-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-  .invoice-table th { text-align: left; padding: 9px 4px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border-bottom: 1.4px solid var(--ink); }
-  .invoice-table td { padding: 12px 4px; font-size: 14px; border-bottom: 1px solid var(--border); }
-  #banner { display: none; background: #FBEDE4; color: #8A3A15; padding: 8px 28px; font-size: 13px; }
+  .invoice-table th { text-align: left; padding: 9px 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border-bottom: 1.4px solid var(--ink); }
+  .invoice-table td { padding: 12px 4px; font-size: 16px; border-bottom: 1px solid var(--border); }
+  #banner { display: none; background: #FBEDE4; color: #8A3A15; padding: 8px 28px; font-size: 15px; }
   @media print {
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
     .no-print { display: none !important; } body { background: #fff; }
@@ -296,7 +296,7 @@ function render(){
         <img class="header-logo" src="${LOGO_DATA_URI}" alt="France Perse Monaco" />
         <div>
           <div class="header-title">Garde-meuble</div>
-          <div class="disp" style="font-size:15px;font-weight:600;color:var(--ink);">Suivi & Facturation trimestrielle</div>
+          <div class="disp" style="font-size:17px;font-weight:600;color:var(--ink);">Suivi & Facturation trimestrielle</div>
         </div>
       </div>
       <div style="display:flex;gap:8px;">
@@ -315,10 +315,10 @@ function renderParams(){
   const co = CONFIG.COMPANY;
   return `
   <div class="no-print" style="padding:28px;max-width:560px;">
-    <div class="disp" style="font-size:20px;font-weight:700;margin-bottom:14px;">Infos entreprise & tarif</div>
+    <div class="disp" style="font-size:23px;font-weight:700;margin-bottom:14px;">Infos entreprise & tarif</div>
     <div style="background:#fff;padding:20px;border-radius:8px;border:1px solid var(--border);">
-      <p style="font-size:13px;color:var(--muted);">Ces valeurs sont définies dans le fichier (objet <span class="mono">CONFIG</span> en haut du code) — modifie-les là-bas puis republie le fichier.</p>
-      <table class="mono" style="font-size:13px;width:100%;">
+      <p style="font-size:15px;color:var(--muted);">Ces valeurs sont définies dans le fichier (objet <span class="mono">CONFIG</span> en haut du code) — modifie-les là-bas puis republie le fichier.</p>
+      <table class="mono" style="font-size:15px;width:100%;">
         <tr><td style="padding:4px 0;color:var(--muted);">Prix / m³ HT / mois</td><td>${formatEUR(CONFIG.PRICE_PER_M3)}</td></tr>
         <tr><td style="padding:4px 0;color:var(--muted);">TVA</td><td>${(CONFIG.TVA_RATE*100).toFixed(0)}%</td></tr>
         <tr><td style="padding:4px 0;color:var(--muted);">Nom entreprise</td><td>${escapeHtml(co.nom||"—")}</td></tr>
@@ -366,7 +366,7 @@ function renderClients(){
         <button class="btn filterbtn ${state.filter==='retard'?'active':''}" onclick="state.filter='retard';render();">En retard</button>
         <button class="btn filterbtn ${state.filter==='jour'?'active':''}" onclick="state.filter='jour';render();">À jour</button>
       </div>
-      <button class="btn" onclick="openAddModal()" style="padding:9px 16px;border-radius:6px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;">+ Nouveau client</button>
+      <button class="btn" onclick="openAddModal()" style="padding:9px 16px;border-radius:6px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;">+ Nouveau client</button>
     </div>
 
     ${list.length === 0 ? `
@@ -429,7 +429,7 @@ function invoiceContentHTML(c, periode, isRelance){
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;">
             <div>
               <img src="${LOGO_DATA_URI}" alt="France Perse Monaco" style="height:52px;display:block;" />
-              <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6;">
+              <div style="font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.6;">
                 ${co.adresse?`<div>${escapeHtml(co.adresse)}</div>`:""}
                 ${co.telephone?`<div>${escapeHtml(co.telephone)}</div>`:""}
                 ${co.email?`<div>${escapeHtml(co.email)}</div>`:""}
@@ -438,23 +438,23 @@ function invoiceContentHTML(c, periode, isRelance){
               </div>
             </div>
             <div style="text-align:right;">
-              <div class="disp" style="font-size:26px;font-weight:700;color:var(--ink);letter-spacing:0.02em;">${isRelance ? "RELANCE — FACTURE" : "FACTURE"}</div>
-              <div class="mono" style="font-size:12px;color:var(--muted);margin-top:4px;">N° ${invoiceNumber}</div>
-              <div class="mono" style="font-size:12px;color:var(--muted);">${today}</div>
+              <div class="disp" style="font-size:30px;font-weight:700;color:var(--ink);letter-spacing:0.02em;">${isRelance ? "RELANCE — FACTURE" : "FACTURE"}</div>
+              <div class="mono" style="font-size:14px;color:var(--muted);margin-top:4px;">N° ${invoiceNumber}</div>
+              <div class="mono" style="font-size:14px;color:var(--muted);">${today}</div>
               <span class="stamp" style="color:${paid?'var(--success)':'var(--danger)'};margin-top:8px;display:inline-flex;">${paid?"Payé":"Non payé"}</span>
             </div>
           </div>
           <div style="height:1px;background:linear-gradient(to right, rgba(22,24,28,0) 0%, var(--border) 14%, var(--border) 86%, rgba(22,24,28,0) 100%);margin-bottom:26px;"></div>
           <div style="margin-bottom:26px;">
-            <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.05em;">Facturé à</div>
-            <div style="font-size:16px;font-weight:700;margin-top:4px;">${escapeHtml(c.nom)}</div>
-            <div style="font-size:13px;color:var(--muted);">${escapeHtml(c.telephone||"")} ${c.email?`· ${escapeHtml(c.email)}`:""}</div>
+            <div style="font-size:12.5px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.05em;">Facturé à</div>
+            <div style="font-size:18.5px;font-weight:700;margin-top:4px;">${escapeHtml(c.nom)}</div>
+            <div style="font-size:15px;color:var(--muted);">${escapeHtml(c.telephone||"")} ${c.email?`· ${escapeHtml(c.email)}`:""}</div>
           </div>
           <table class="invoice-table" style="margin-top:8px;">
             <thead><tr><th style="background:var(--navy);color:#fff;padding:9px 12px;border-radius:6px 0 0 0;">Description</th><th style="background:var(--navy);color:#fff;text-align:right;padding:9px 12px;border-radius:0 6px 0 0;">Montant</th></tr></thead>
             <tbody>
               <tr>
-                <td style="padding:10px 12px;">Location garde-meuble — Box ${escapeHtml(c.box||"—")} · <span class="mono">${c.volume}m³</span><br/><span style="font-size:12px;color:var(--muted);">Période : ${periodLabel(periode)}</span></td>
+                <td style="padding:10px 12px;">Location garde-meuble — Box ${escapeHtml(c.box||"—")} · <span class="mono">${c.volume}m³</span><br/><span style="font-size:14px;color:var(--muted);">Période : ${periodLabel(periode)}</span></td>
                 <td class="mono" style="text-align:right;padding:10px 12px;font-weight:700;color:var(--blue-deep);">${formatEUR(ht)}</td>
               </tr>
               <tr>
@@ -464,11 +464,11 @@ function invoiceContentHTML(c, periode, isRelance){
             </tbody>
           </table>
           <div style="display:flex;justify-content:flex-end;">
-            <div style="width:240px;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;font-size:14px;font-weight:700;background:var(--blue-deep);color:#fff;border-radius:6px;">
-              <span class="disp" style="text-transform:uppercase;letter-spacing:0.04em;font-size:12px;">Total TTC</span><span class="mono" style="font-size:17px;">${formatEUR(ttc)}</span>
+            <div style="width:240px;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;font-size:16px;font-weight:700;background:var(--blue-deep);color:#fff;border-radius:6px;">
+              <span class="disp" style="text-transform:uppercase;letter-spacing:0.04em;font-size:14px;">Total TTC</span><span class="mono" style="font-size:19.5px;">${formatEUR(ttc)}</span>
             </div>
           </div>
-          ${co.iban ? `<div style="margin-top:24px;font-size:12px;color:var(--muted);">Paiement par virement — IBAN : <span class="mono">${escapeHtml(co.iban)}</span></div>` : ""}
+          ${co.iban ? `<div style="margin-top:24px;font-size:14px;color:var(--muted);">Paiement par virement — IBAN : <span class="mono">${escapeHtml(co.iban)}</span></div>` : ""}
         </div>`;
 }
 
@@ -498,9 +498,9 @@ function printInvoice(clientId, periode, isRelance){
   body { margin:0; font-family:'Inter',sans-serif; color:var(--ink); background:#fff; }
   .disp { font-family:'Space Grotesk',sans-serif; }
   .mono { font-family:-apple-system,'Helvetica Neue',Helvetica,Arial,sans-serif; font-variant-numeric: tabular-nums; }
-  .stamp { display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border:2px solid currentColor; border-radius:3px; font-family:'Space Grotesk',sans-serif; font-weight:700; letter-spacing:0.06em; font-size:12px; text-transform:uppercase; transform:rotate(-2deg); }
+  .stamp { display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border:2px solid currentColor; border-radius:3px; font-family:'Space Grotesk',sans-serif; font-weight:700; letter-spacing:0.06em; font-size:14px; text-transform:uppercase; transform:rotate(-2deg); }
   .invoice-table { width:100%; border-collapse:collapse; margin-bottom:20px; }
-  .invoice-table td { padding:12px 4px; font-size:14px; border-bottom:1px solid var(--border); }
+  .invoice-table td { padding:12px 4px; font-size:16px; border-bottom:1px solid var(--border); }
 </style>
 </head><body>${content}</body></html>`);
   doc.close();
@@ -530,19 +530,19 @@ function renderModal(){
     div.innerHTML = `
     <div class="modal-overlay no-print" onclick="closeModal()">
       <div class="modal" onclick="event.stopPropagation()">
-        <div class="disp" style="font-size:20px;font-weight:700;margin-bottom:14px;">${f.id?"Modifier le client":"Nouveau client"}</div>
+        <div class="disp" style="font-size:23px;font-weight:700;margin-bottom:14px;">${f.id?"Modifier le client":"Nouveau client"}</div>
         <div class="field"><label>Nom / Société</label><input id="f-nom" value="${escapeAttr(f.nom)}"/></div>
         <div class="field"><label>Téléphone</label><input id="f-telephone" value="${escapeAttr(f.telephone)}"/></div>
         <div class="field"><label>Email</label><input id="f-email" value="${escapeAttr(f.email)}"/></div>
         <div class="field"><label>N° de box (optionnel)</label><input id="f-box" value="${escapeAttr(f.box)}"/></div>
         <div class="field"><label>Volume (m³)</label><input id="f-volume" value="${escapeAttr(f.volume)}"/></div>
         <div class="field"><label>Mois de début (ancre du cycle de 3 mois)</label><input id="f-dateDebut" type="month" value="${escapeAttr(f.dateDebut)}"/></div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Tarif estimé : <span class="mono">${formatEUR(tarifTrimestreTTC(f.volume))}</span> TTC / trimestre</div>
+        <div style="font-size:14px;color:var(--muted);margin-bottom:10px;">Tarif estimé : <span class="mono">${formatEUR(tarifTrimestreTTC(f.volume))}</span> TTC / trimestre</div>
         <div style="display:flex;justify-content:space-between;margin-top:18px;">
-          <div>${f.id ? `<button class="btn" onclick="deleteClient('${f.id}')" style="padding:9px 14px;border-radius:4px;background:transparent;color:var(--danger);font-size:13px;">Supprimer</button>` : ""}</div>
+          <div>${f.id ? `<button class="btn" onclick="deleteClient('${f.id}')" style="padding:9px 14px;border-radius:4px;background:transparent;color:var(--danger);font-size:15px;">Supprimer</button>` : ""}</div>
           <div style="display:flex;gap:8px;">
-            <button class="btn" onclick="closeModal()" style="padding:9px 16px;border-radius:4px;background:var(--bg);font-size:14px;">Annuler</button>
-            <button class="btn" onclick="submitForm(${f.id ? `'${f.id}'` : "null"})" style="padding:9px 16px;border-radius:4px;background:var(--primary);color:#fff;font-size:14px;font-weight:700;">Enregistrer</button>
+            <button class="btn" onclick="closeModal()" style="padding:9px 16px;border-radius:4px;background:var(--bg);font-size:16px;">Annuler</button>
+            <button class="btn" onclick="submitForm(${f.id ? `'${f.id}'` : "null"})" style="padding:9px 16px;border-radius:4px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;">Enregistrer</button>
           </div>
         </div>
       </div>
@@ -557,33 +557,33 @@ function renderModal(){
       <div class="modal" onclick="event.stopPropagation()">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
-            <div class="disp" style="font-size:24px;font-weight:800;">${escapeHtml(c.nom)}</div>
-            <div class="mono" style="font-size:13px;color:var(--muted);">Box ${escapeHtml(c.box||'—')} · ${c.volume}m³ · ${formatEUR(tarifTrimestreTTC(c.volume))}/trim. TTC</div>
+            <div class="disp" style="font-size:27.5px;font-weight:800;">${escapeHtml(c.nom)}</div>
+            <div class="mono" style="font-size:15px;color:var(--muted);">Box ${escapeHtml(c.box||'—')} · ${c.volume}m³ · ${formatEUR(tarifTrimestreTTC(c.volume))}/trim. TTC</div>
           </div>
-          <button class="btn" onclick="openEditModal('${c.id}')" style="padding:6px 12px;border-radius:4px;background:var(--bg);font-size:13px;">Modifier</button>
+          <button class="btn" onclick="openEditModal('${c.id}')" style="padding:6px 12px;border-radius:4px;background:var(--bg);font-size:15px;">Modifier</button>
         </div>
-        <div style="margin-top:6px;font-size:13px;color:var(--muted);">
+        <div style="margin-top:6px;font-size:15px;color:var(--muted);">
           ${c.telephone ? `<div>${escapeHtml(c.telephone)}</div>` : ""}
           ${c.email ? `<div>${escapeHtml(c.email)}</div>` : ""}
         </div>
-        <div class="disp" style="font-size:15px;font-weight:700;margin-top:20px;margin-bottom:8px;">Paiements (par trimestre, depuis le début)</div>
+        <div class="disp" style="font-size:17px;font-weight:700;margin-top:20px;margin-bottom:8px;">Paiements (par trimestre, depuis le début)</div>
         <div>
           ${periods.map(p => {
             const paid = isPaid(c.id, p);
             return `
             <div class="paymentrow">
-              <span style="font-size:13px;font-weight:600;">${periodLabel(p)}</span>
+              <span style="font-size:15px;font-weight:600;">${periodLabel(p)}</span>
               <div style="display:flex;gap:8px;align-items:center;">
-                <button class="btn" onclick="togglePaid('${c.id}','${p}')" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;background:${paid?'var(--success)':'#fff'};color:${paid?'#fff':'var(--danger)'};border:1px solid ${paid?'var(--success)':'var(--danger)'};">
+                <button class="btn" onclick="togglePaid('${c.id}','${p}')" style="padding:5px 12px;border-radius:6px;font-size:14px;font-weight:700;background:${paid?'var(--success)':'#fff'};color:${paid?'#fff':'var(--danger)'};border:1px solid ${paid?'var(--success)':'var(--danger)'};">
                   ${paid?"Payé ✓":"Marquer payé"}
                 </button>
-                <button class="btn" onclick="openInvoice('${c.id}','${p}')" style="padding:5px 10px;border-radius:4px;font-size:12px;background:transparent;color:var(--primary);text-decoration:underline;">Facture</button>
+                <button class="btn" onclick="openInvoice('${c.id}','${p}')" style="padding:5px 10px;border-radius:4px;font-size:14px;background:transparent;color:var(--primary);text-decoration:underline;">Facture</button>
               </div>
             </div>`;
           }).join("")}
         </div>
         <div style="margin-top:18px;text-align:right;">
-          <button class="btn" onclick="closeModal()" style="padding:9px 16px;border-radius:4px;background:var(--bg);font-size:14px;">Fermer</button>
+          <button class="btn" onclick="closeModal()" style="padding:9px 16px;border-radius:4px;background:var(--bg);font-size:16px;">Fermer</button>
         </div>
       </div>
     </div>`;
@@ -598,13 +598,13 @@ function renderModal(){
       <div class="modal" style="max-width:640px;padding:0;" onclick="event.stopPropagation()">
         ${invoiceContentHTML(c, periode, isRelance)}
         <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:16px 40px 24px;">
-          <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;">
+          <label style="display:flex;align-items:center;gap:7px;font-size:15px;color:var(--muted);cursor:pointer;">
             <input type="checkbox" ${isRelance ? "checked" : ""} onchange="state.modal.relance=this.checked; renderModal();" style="accent-color:var(--blue-deep);width:15px;height:15px;"/>
             C'est une relance
           </label>
           <div style="display:flex;gap:8px;">
-            <button class="btn" onclick="closeModal()" style="padding:9px 16px;border-radius:6px;background:var(--bg);font-size:14px;">Fermer</button>
-            <button class="btn" onclick="printInvoice('${c.id}','${periode}',${isRelance})" style="padding:9px 18px;border-radius:6px;background:var(--primary);color:#fff;font-size:14px;font-weight:700;">Imprimer / PDF</button>
+            <button class="btn" onclick="closeModal()" style="padding:9px 16px;border-radius:6px;background:var(--bg);font-size:16px;">Fermer</button>
+            <button class="btn" onclick="printInvoice('${c.id}','${periode}',${isRelance})" style="padding:9px 18px;border-radius:6px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;">Imprimer / PDF</button>
           </div>
         </div>
       </div>
